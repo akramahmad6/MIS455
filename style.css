@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Country Info Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header, footer {
+      background-color: #0077b6;
+      color: white;
+      text-align: center;
+      padding: 1em 0;
+    }
+    main {
+      padding: 2em;
+      max-width: 600px;
+      margin: auto;
+    }
+    input[type="text"] {
+      width: 70%;
+      padding: 0.5em;
+      font-size: 1em;
+    }
+    button {
+      padding: 0.5em 1em;
+      font-size: 1em;
+      margin-left: 10px;
+      background-color: #0077b6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #result {
+      background-color: white;
+      padding: 1em;
+      margin-top: 2em;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    img {
+      max-width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Country Information Finder</h1>
+  </header>
+
+  <main>
+    <input type="text" id="countryInput" placeholder="Enter country name...">
+    <button onclick="getCountryInfo()">Search</button>
+    <div id="result"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Country Info App</p>
+  </footer>
+
+  <script>
+    async function getCountryInfo() {
+      const country = document.getElementById("countryInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = ""; // Clear previous results
+      if (!country) {
+        resultDiv.innerHTML = "<p>Please enter a country name.</p>";
+        return;
+      }
+      try {
+        const response = await fetch(`https://restcountries.com/v3.1/name/${country}`);
+        if (!response.ok) throw new Error("Country not found");
+        const data = await response.json();
+        const countryData = data[0];
+        const name = countryData.name.common;
+        const capital = countryData.capital[0];
+        const flag = countryData.flags.png;
+        const currency = Object.values(countryData.currencies)[0].name;
+        const population = countryData.population;
+        const region = countryData.region;
+        const languages = Object.values(countryData.languages).join(", ");
+
+        resultDiv.innerHTML = `
+          <h2>${name}</h2>
+          <img src="${flag}" alt="Flag of ${name}">
+          <p><strong>Capital:</strong> ${capital}</p>
+          <p><strong>Currency:</strong> ${currency}</p>
+          <p><strong>Population:</strong> ${population}</p>
+          <p><strong>Region:</strong> ${region}</p>
+          <p><strong>Languages:</strong> ${languages}</p>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
